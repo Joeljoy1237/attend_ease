@@ -1,10 +1,10 @@
-export const roles = {
+const roles = {
   adminRole: "admin",
   studentRole: "student",
   teacherRole: "teacher",
 };
 
-export const successResponse = (data = {}) => {
+const successResponse = (data = {}) => {
   const currentTime = new Date();
   const currentHour = currentTime.getUTCHours() + 5; // Adjust for GMT+5
   const currentMinutes = currentTime.getUTCMinutes() + 30; // Adjust for GMT+30
@@ -28,7 +28,7 @@ export const successResponse = (data = {}) => {
     ...data,
     timestamp: currentTime.toISOString(),
     apiVersion: "V1",
-    dev: "MidNitCode Innovations",
+    dev: "Midnitcode Innovations",
   };
 
   // if (data?.description) {
@@ -37,7 +37,7 @@ export const successResponse = (data = {}) => {
   return res;
 };
 
-export const customError = (data = {}) => {
+const customError = (data = {}) => {
     const currentTime = new Date();
     const currentHour = currentTime.getUTCHours() + 5; // Adjust for GMT+5
     const currentMinutes = currentTime.getUTCMinutes() + 30; // Adjust for GMT+30
@@ -61,8 +61,8 @@ export const customError = (data = {}) => {
         message: data?.message || "An unknown error occurred.",
         ...data,
         timestamp: currentTime.toISOString(),
-        apiVersion: "V2",
-        dev: "MidNitCode Innovations",
+        apiVersion: "V1",
+        dev: "Midnitcode Innovations",
     };
 
     // Conditionally include the 'description' parameter if it has a value
@@ -73,7 +73,7 @@ export const customError = (data = {}) => {
     return errorObject;
 }
 
-export const resMessages = {
+const resMessages = {
     invalidUserNameOrPasswordMessage: "Invalid username or password!",
     accessDeniedMessage: "Access Denied",
     userNotfoundMessage: "User not found",
@@ -92,9 +92,17 @@ export const resMessages = {
     passwordResetMessage: "Password reset successfully"
 }
 
-export function formatDate(date) {
+function formatDate(date) {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
+}
+
+module.exports = {
+  roles,
+  successResponse,
+  customError,
+  formatDate,
+  resMessages
 }
