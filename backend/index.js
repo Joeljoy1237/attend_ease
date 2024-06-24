@@ -4,10 +4,8 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const connectDb = require("./utils/database");
-const adminRoute = require('./routes/admin');
-// const studentRoute = require('./Routes/student.js')
-// const teacherRoute = require('./Routes/teacher.js')
-// const publicRoute = require('./Routes/common.js')
+const userRoute = require('./routes/user');
+const authRoute = require('./routes/auth')
 // const rateLimit = require('express-rate-limit');
 
 dotenv.config();
@@ -21,10 +19,8 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use("/api/v1/admin", adminRoute);
-// app.use("/api/v2/student", studentRoute);
-// app.use("/api/v2/teacher", teacherRoute);
-// app.use("/api/v2/public", publicRoute);
+app.use("/api/v1/user", userRoute);
+app.use("/api/v1/auth",authRoute)
 
 // app.use((req, res, next) => {
 //   if (req.secure) {

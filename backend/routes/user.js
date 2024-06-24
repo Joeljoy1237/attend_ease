@@ -1,16 +1,18 @@
 const express = require("express");
+const router = express.Router();
 const {
   customError,
   successResponse,
   resMessages,
-  roles,
+  abstractedTeacherData,
 } = require("../utils/helpers");
 const TeacherModel = require("../models/Teacher");
-const router = express.Router();
 const bcrypt = require("bcrypt");
 const ClassModel = require("../models/Class");
 const Student = require("../models/Student");
 const { mongoose } = require("mongoose");
+const { verifyToken, verifyAdminToken } = require("../libs/Auth");
+const { json } = require("body-parser");
 const { ObjectId } = mongoose.Types;
 
 //test api
@@ -19,8 +21,29 @@ router.get("/test", (req, res) => {
   res.json("Admin route");
 });
 
+//Api to get user details
+router.get("/getUserDetails", verifyToken, async (req, res) => {
+  try {
+    const userData = abstractedTeacherData(req.user);
+    const response = successResponse({
+      status: 200,
+      message: "Here's your details",
+      data: userData,
+      accessToken: req.accessToken,
+    });
+    return res.status(200).json(response);
+  } catch (error) {
+    console.error(error);
+    const status = error?.status || 500;
+    const message = error?.message || "Internal Server Error";
+    const description = error?.description;
+    const errorMessage = customError({ resCode: status, message, description });
+    return res.status(status).json(errorMessage);
+  }
+});
+
 //Api to create new teacher (admin can't be manually created)
-router.post("/createAdmin", async (req, res) => {
+router.post("/createAdmin", verifyAdminToken,async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
 
@@ -79,7 +102,7 @@ router.post("/createAdmin", async (req, res) => {
 });
 
 //Api to create new class
-router.post("/createClass", async (req, res) => {
+router.post("/createClass",verifyAdminToken, async (req, res) => {
   try {
     const { className, classId } = req.body;
 
