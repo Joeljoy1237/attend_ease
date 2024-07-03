@@ -12,8 +12,8 @@ export default function SideBar({ sideBarMenu }) {
       <div className="mt-[10vh] w-full">
         <SideBarBody sideBarMenu={sideBarMenu} />
       </div>
-      <div className="absolute bottom-5 left-[1vw] self-center flex w-full items-center justify-center">
-        <button className="px-3 py-3 bg-primary-100 gap-3 flex items-center justify-center w-[90%] rounded-lg font-semibold text-primary">
+      <div className="absolute bottom-5 left-0 w-[100%] self-center flex items-center justify-center">
+        <button className="bg-primary-100 gap-3 py-3 flex items-center self-center justify-center w-[90%] rounded-lg font-semibold text-primary">
           <IoLogOutOutline className="text-xl font-semibold"/> LOGOUT
         </button>
       </div>

@@ -21,11 +21,11 @@ export default function DashboardRootLayout() {
   },
   ]
   return (
-    <div className="flex">
+    <div className="flex overflow-hidden">
       <SideBar sideBarMenu={buttons}/>
-      <div className="">
+      <div>
         <TopBar />
-        <div className="">
+        <div className="bg-primary-50 p-3 w-[85.5vw] h-[91vh] flex overflow-hidden">
           <Suspense fallback={<>hey please wait loading</>}>
             <Outlet />
           </Suspense>
