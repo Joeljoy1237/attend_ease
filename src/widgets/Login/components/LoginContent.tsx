@@ -1,35 +1,34 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  User,
-} from "firebase/auth";
-import { auth } from "../../../config/firebaseConfig";
+import { signIn, useSession } from "next-auth/react";
 import customToast from "@components/CustomToast";
 import { useRouter } from "next/navigation";
 
 export default function LoginContent() {
+  const { data: session, status } = useSession();
+
   const [email, setEmail] = useState("");
-  const [user, setUser] = useState<User | null>(null);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
   useEffect(() => {
-    console.log(auth)
-    if (auth.currentUser) {
+    console.log(status);
+    if (status === "authenticated") {
       router.replace("/dashboard/home");
     }
-  }, []);
+  }, [status]);
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
     try {
       console.log("called");
-      const res = await signInWithEmailAndPassword(auth, email, password);
-      setUser(auth.currentUser);
+      const res = await signIn("credentials", {
+        email: email,
+        password: password,
+        redirect: false,
+      });
       router.push("/dashboard/home");
-      if (res) {
+      if (res?.ok) {
         customToast({
           type: "success",
           message: "Login Successful",
