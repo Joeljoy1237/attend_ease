@@ -1,6 +1,8 @@
-import LandingPage from "@widgets/LandingPage/view";
-import React from "react";
+import Login from '@widgets/Login'
+import React from 'react'
 
-export default function Home() {
-  return <LandingPage />;
+export default function page() {
+  return (
+    <Login/>
+  )
 }
