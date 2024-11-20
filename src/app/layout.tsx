@@ -1,5 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
+import Provider from "@components/Provider";
 import "@styles/scss/main.scss";
 import { Toaster } from "react-hot-toast";
 
@@ -16,14 +17,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Toaster
-          position="bottom-center"
-          reverseOrder={false}
-          toastOptions={{
-            duration: 3000,
-          }}
-        />
-        {children}
+        <Provider>
+          <Toaster
+            position="bottom-center"
+            reverseOrder={false}
+            toastOptions={{
+              duration: 3000,
+            }}
+          />
+          {children}
+        </Provider>
       </body>
     </html>
   );
