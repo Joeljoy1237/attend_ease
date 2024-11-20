@@ -21,8 +21,6 @@ export default function DashboardLyout({
       setTimeout(() => {
         router.replace("/login");
       }, 1000);
-    } else {
-      console.log(session);
     }
   }, [status]);
 
