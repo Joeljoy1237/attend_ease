@@ -1,6 +1,7 @@
+"use client";
 import BatchItem from "@components/BatchItem";
 import TitleBar from "@components/TitleBar";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { LuRefreshCcw } from "react-icons/lu";
 import { FiEdit } from "react-icons/fi";
@@ -8,6 +9,22 @@ import { FaCirclePlus } from "react-icons/fa6";
 import { MdOutlineDelete } from "react-icons/md";
 
 export default function ManageContent() {
+  const [studentData, setStudentData] = useState([]);
+
+  useEffect(() => {
+    const res = fetchStudent();
+  }, []);
+
+  const fetchStudent = async () => {
+    const res = await fetch("/api/batch/all");
+
+    if (res.ok) {
+      const data = await res.json();
+      console.log(data.studentData);
+      setStudentData(data.studentData);
+    }
+  };
+
   return (
     <div className="bg-white w-full h-full rounded-[5px] p-6">
       <div className="flex flex-col space-y-6">
@@ -72,28 +89,30 @@ export default function ManageContent() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {Array(5)
-                .fill(null)
-                .map((_, index) => (
-                  <tr key={index} className="h-[2rem]">
-                    <td className="px-4 py-2 text-base text-gray-700">1</td>
-                    <td className="px-4 py-2 text-base text-gray-700">
-                      Abhishek
-                    </td>
-                    <td className="px-4 py-2 text-base text-gray-700">1522</td>
-                    <td className="px-4 py-2 text-base text-gray-700">
-                      Computer Science
-                    </td>
-                    <td className="px-4 py-2 text-center flex items-center justify-center">
-                      <button className="text-blue-500 hover:text-blue-700">
-                        <FiEdit className="text-xl"/>
-                      </button>
-                      <button className="text-red-500 hover:text-red-700 ml-2">
-                        <MdOutlineDelete className="text-2xl"/>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+              {studentData!.map((student: any, index) => (
+                <tr key={index} id={student._id} className="h-[2rem]">
+                  <td className="px-4 py-2 text-base text-gray-700">
+                    {student.rollNo}
+                  </td>
+                  <td className="px-4 py-2 text-base text-gray-700">
+                    {student.name}
+                  </td>
+                  <td className="px-4 py-2 text-base text-gray-700">
+                    {student.admnNo}
+                  </td>
+                  <td className="px-4 py-2 text-base text-gray-700">
+                    {student.branch}
+                  </td>
+                  <td className="px-4 py-2 text-center flex items-center justify-center">
+                    <button className="text-blue-500 hover:text-blue-700">
+                      <FiEdit className="text-xl" />
+                    </button>
+                    <button className="text-red-500 hover:text-red-700 ml-2">
+                      <MdOutlineDelete className="text-2xl" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
