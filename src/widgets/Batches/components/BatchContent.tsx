@@ -1,14 +1,28 @@
-
-"use client"
+"use client";
 import BatchItem from "@components/BatchItem";
 import TitleBar from "@components/TitleBar";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { LuRefreshCcw } from "react-icons/lu";
 import { FaCirclePlus } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 
 export default function BatchContent() {
+  const [batchData, setBatchData] = useState([]);
+
+  useEffect(() => {
+    fetchBatchCount();
+  }, []);
+
+  const fetchBatchCount = async () => {
+    const res = await fetch("/api/batch/count");
+
+    if (res.ok) {
+      const data = await res.json();
+      setBatchData(data.data);
+    }
+  };
+
   const router = useRouter();
   return (
     <div className="bg-white w-full h-full rounded-[5px] p-6">
@@ -16,9 +30,15 @@ export default function BatchContent() {
         <div className="flex flex-row items-center justify-between">
           <TitleBar title="All batches" />
           <div className="">
-            <button onClick={()=>{
-              router.push('/dashboard/batches/new-batch')
-            }} className="p-3 text-white bg-azure-600 outline-none border-none rounded-[8px] flex items-center justify-center gap-2"><FaCirclePlus className="text-2xl text-white"/>Add New Batch</button>
+            <button
+              onClick={() => {
+                router.push("/dashboard/batches/new-batch");
+              }}
+              className="p-3 text-white bg-azure-600 outline-none border-none rounded-[8px] flex items-center justify-center gap-2"
+            >
+              <FaCirclePlus className="text-2xl text-white" />
+              Add New Batch
+            </button>
           </div>
         </div>
         <div className="flex flex-row">
@@ -52,51 +72,14 @@ export default function BatchContent() {
         </div>
         <div className="w-full h-[1px] bg-gray-300"></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          <BatchItem
-            batchCode="C1"
-            batchName="Computer Science"
-            totalStudents={42}
-          />
-          <BatchItem
-            batchCode="B1"
-            batchName="Biology Science"
-            totalStudents={36}
-          />
-          <BatchItem
-            batchCode="B1"
-            batchName="Biology Science"
-            totalStudents={36}
-          />
-          <BatchItem
-            batchCode="B1"
-            batchName="Biology Science"
-            totalStudents={36}
-          />
-          <BatchItem
-            batchCode="B1"
-            batchName="Biology Science"
-            totalStudents={36}
-          />
-          <BatchItem
-            batchCode="B1"
-            batchName="Biology Science"
-            totalStudents={36}
-          />
-          <BatchItem
-            batchCode="B1"
-            batchName="Biology Science"
-            totalStudents={36}
-          />
-          <BatchItem
-            batchCode="B1"
-            batchName="Biology Science"
-            totalStudents={36}
-          />
-          <BatchItem
-            batchCode="B1"
-            batchName="Biology Science"
-            totalStudents={36}
-          />
+          {batchData!.map((batch: any, index) => (
+            <BatchItem
+              key={index}
+              batchCode={batch._id}
+              batchName="Computer Science"
+              totalStudents={batch.totalStudent}
+            />
+          ))}
         </div>
       </div>
     </div>
