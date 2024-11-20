@@ -1,21 +1,27 @@
 import { Schema, model, models } from "mongoose";
 
-const UserSchema = new Schema(
+const StudentSchema = new Schema(
     {
         name: {
             type: String,
             require: [true, "Fist Name is required"],
         },
-        phone: {
+        phoneNo: {
             type: String,
             require: [true, "Phone number is required"],
         },
+        admnNo: {
+            type: String,
+            require: [true, "Admission number is required"],
+        },
+        rollNo: {
+            type: Number,
+            require: [true, "Roll number is required"],
+        },
         branch: {
             type: String,
-            require: [true, "branch is required"],
-            enum: ["C1", "C2", "B1", "B2"]
+            require: [true, "branch is required"]
         },
-
         division: {
             type: String,
             require: [true, "division is required"],
@@ -25,5 +31,5 @@ const UserSchema = new Schema(
     { timestamps: true }
 );
 
-const User = models.User || model("User", UserSchema);
-export default User;
+const Student = models.Student || model("Student", StudentSchema);
+export default Student;
