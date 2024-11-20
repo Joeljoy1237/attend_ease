@@ -27,8 +27,8 @@ export default function LoginContent() {
         password: password,
         redirect: false,
       });
-      router.push("/dashboard/home");
       if (res?.ok) {
+        router.push("/dashboard/home");
         customToast({
           type: "success",
           message: "Login Successful",
@@ -37,28 +37,10 @@ export default function LoginContent() {
       }
     } catch (error: any) {
       setError(error.code); // Extract and set the error message
-      // Handle specific Firebase authentication errors
-      if (error.code === "auth/invalid-credential") {
-        customToast({
-          type: "error",
-          message: "Invalid Email or Password",
-        });
-      } else if (error.code === "auth/invalid-password") {
-        customToast({
-          type: "error",
-          message: "Invalid Password",
-        });
-      } else if (error.code === "auth/invalid-email") {
-        customToast({
-          type: "error",
-          message: "Invalid Email",
-        });
-      } else {
-        customToast({
-          type: "error",
-          message: error.message || "An error occurred. Please try again.",
-        });
-      }
+      customToast({
+        type: "error",
+        message: error.message || "An error occurred. Please try again.",
+      });
     }
   };
   return (

@@ -1,18 +1,24 @@
+
+"use client"
 import BatchItem from "@components/BatchItem";
 import TitleBar from "@components/TitleBar";
 import React from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { LuRefreshCcw } from "react-icons/lu";
 import { FaCirclePlus } from "react-icons/fa6";
+import { useRouter } from "next/navigation";
 
 export default function BatchContent() {
+  const router = useRouter();
   return (
     <div className="bg-white w-full h-full rounded-[5px] p-6">
       <div className="flex flex-col space-y-6">
         <div className="flex flex-row items-center justify-between">
           <TitleBar title="All batches" />
           <div className="">
-            <button className="p-3 text-white bg-azure-600 outline-none border-none rounded-[8px] flex items-center justify-center gap-2"><FaCirclePlus className="text-2xl text-white"/>Add New Batch</button>
+            <button onClick={()=>{
+              router.push('/dashboard/batches/new-batch')
+            }} className="p-3 text-white bg-azure-600 outline-none border-none rounded-[8px] flex items-center justify-center gap-2"><FaCirclePlus className="text-2xl text-white"/>Add New Batch</button>
           </div>
         </div>
         <div className="flex flex-row">
