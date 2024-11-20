@@ -22,7 +22,7 @@ export default function BatchContent() {
       setBatchData(data.data);
     }
   };
-
+console.log(batchData)
   const router = useRouter();
   return (
     <div className="bg-white w-full h-full rounded-[5px] p-6">
@@ -75,9 +75,9 @@ export default function BatchContent() {
           {batchData!.map((batch: any, index) => (
             <BatchItem
               key={index}
-              batchCode={batch._id}
-              batchName="Computer Science"
-              totalStudents={batch.totalStudent}
+              batchCode={batch.division}
+              batchName={batch.branch}
+              totalStudents={batch.totalStudents}
             />
           ))}
         </div>

@@ -75,6 +75,9 @@ export default function ManageContent() {
                   Sl No.
                 </th>
                 <th className="px-4 py-2 text-left text-base font-medium text-azure-600">
+                  Roll no.
+                </th>
+                <th className="px-4 py-2 text-left text-base font-medium text-azure-600">
                   Name
                 </th>
                 <th className="px-4 py-2 text-left text-base font-medium text-azure-600">
@@ -91,6 +94,9 @@ export default function ManageContent() {
             <tbody className="divide-y divide-gray-200">
               {studentData!.map((student: any, index) => (
                 <tr key={index} id={student._id} className="h-[2rem]">
+                  <td className="px-4 py-2 text-base text-gray-700">
+                    {index+1}
+                  </td>
                   <td className="px-4 py-2 text-base text-gray-700">
                     {student.rollNo}
                   </td>

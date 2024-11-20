@@ -1,14 +1,26 @@
 "use client";
 import TitleBar from "@components/TitleBar";
-import React, { useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+
+interface Student {
+  name: string;
+  rollNo: string;
+  batchCode: string;
+}
 
 export default function MarkAttendanceContent() {
   const [activeTab, setActiveTab] = useState<"rollNo" | "checkList">("rollNo");
   const [rollNo, setRollNo] = useState<string>("");
   const [attendance, setAttendance] = useState<{ [key: string]: boolean }>({});
+  const [students, setStudents] = useState<Student[] | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const { division } = useParams();
 
   // Example student list for the "Check List" method
-  const students = [
+  const studentList = [
     { rollNo: "101", name: "Alice" },
     { rollNo: "102", name: "Bob" },
     { rollNo: "103", name: "Charlie" },
@@ -31,6 +43,38 @@ export default function MarkAttendanceContent() {
       setRollNo(""); // Clear input after marking attendance
     }
   };
+
+  const fetchStudents = async () => {
+    setLoading(true);
+    setError(null);
+    setStudents(null);
+
+    try {
+      const response = await fetch("/api/attendance/getStudentsListByBatch", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ batchCode: division }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch students.");
+      }
+
+      const data = await response.json();
+      setStudents(data.students);
+      console.log(data);
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
 
   return (
     <div className="p-6 bg-white flex flex-col gap-8">
@@ -84,7 +128,7 @@ export default function MarkAttendanceContent() {
             Check List
           </h2>
           <ul className="space-y-2 grid">
-            {students.map((student) => (
+            {students?.map((student) => (
               <li
                 key={student.rollNo}
                 className="flex items-center space-x-4 border rounded-lg px-4 py-2"
@@ -96,7 +140,7 @@ export default function MarkAttendanceContent() {
                     handleCheckListChange(student.rollNo, e.target.checked)
                   }
                 />
-                <span>
+                <span className="capitalize">
                   {student.rollNo} - {student.name}
                 </span>
               </li>

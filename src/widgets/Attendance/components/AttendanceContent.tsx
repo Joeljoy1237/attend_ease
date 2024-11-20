@@ -1,9 +1,24 @@
+"use client"
 import BatchItem from "@components/BatchItem";
 import TitleBar from "@components/TitleBar";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { LuRefreshCcw } from "react-icons/lu";
 export default function AttendanceContent() {
+  const [batchData, setBatchData] = useState([]);
+
+  useEffect(() => {
+    fetchBatchCount();
+  }, []);
+
+  const fetchBatchCount = async () => {
+    const res = await fetch("/api/batch/count");
+
+    if (res.ok) {
+      const data = await res.json();
+      setBatchData(data.data);
+    }
+  };
   return (
     <div className="bg-white w-full h-full rounded-[5px] p-6">
       <div className="flex flex-col space-y-5">
@@ -41,52 +56,14 @@ export default function AttendanceContent() {
         </div>
         <div className="w-full h-[1px] bg-gray-300"></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          <BatchItem
-            batchCode="C1"
-            batchName="Computer Science"
-            totalStudents={42}
-          />
-          <BatchItem
-            batchCode="B1"
-            batchName="Biology Science"
-            totalStudents={36}
-          />
-          <BatchItem
-            batchCode="B1"
-            batchName="Biology Science"
-            totalStudents={36}
-          />
-          <BatchItem
-            batchCode="B1"
-            batchName="Biology Science"
-            totalStudents={36}
-          />
-          <BatchItem
-            batchCode="B1"
-            batchName="Biology Science"
-            totalStudents={36}
-          />
-          <BatchItem
-            batchCode="B1"
-            batchName="Biology Science"
-            totalStudents={36}
-          />
-          <BatchItem
-            batchCode="B1"
-            batchName="Biology Science"
-            totalStudents={36}
-          />
-          <BatchItem
-            batchCode="B1"
-            batchName="Biology Science"
-            totalStudents={36}
-          />
-          <BatchItem
-            batchCode="B1"
-            batchName="Biology Science"
-            totalStudents={36}
-          />
-
+        {batchData!.map((batch: any, index) => (
+            <BatchItem
+              key={index}
+              batchCode={batch.division}
+              batchName={batch.branch}
+              totalStudents={batch.totalStudents}
+            />
+          ))}
         </div>
       </div>
     </div>

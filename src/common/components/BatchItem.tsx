@@ -15,18 +15,31 @@ export default function BatchItem({
 }: BatchItemProps) {
   const router = useRouter();
   const location = usePathname();
-  console.log(location);
+
+  // Mapping for batch names
+  const batchNameMap: { [key: string]: string } = {
+    cs: "Computer Science",
+    hu: "Humanities",
+    co: "Commerce",
+    bio: "Biology Science",
+  };
+
+  // Convert batchName using mapping or use the original
+  const fullBatchName = batchNameMap[batchName] || batchName;
+console.log(batchName)
   return (
     <div className="flex flex-col bg-white shadow-md p-4 rounded-lg border border-gray-200 w-[285px] gap-5">
       <div className="flex flex-row items-center gap-4">
-        <span className="text-2xl font-semibold text-azure-600">
+        <span className="text-2xl font-semibold text-azure-600 uppercase">
           {batchCode}
         </span>
         <div className="w-[1px] h-[2rem] bg-gray-400"></div>
-        <span className="text-base font-normal text-gray-700">{batchName}</span>
+        <span className="text-base font-normal text-gray-700">
+          {fullBatchName}
+        </span>
       </div>
       <div className="flex flex-row items-center gap-2">
-        <span className="">Total students:</span>
+        <span className="text-gray-800">Total students:</span>
         <span className="text-xl font-semibold text-azure-600">
           {totalStudents}
         </span>
@@ -36,7 +49,7 @@ export default function BatchItem({
         <button
           onClick={() => {
             if (location === "/dashboard/attendance") {
-              router.push("/dashboard/attendance/mark-attendance");
+              router.push(`/dashboard/attendance/${batchCode}/mark-attendance`);
             } else {
               router.push("/dashboard/batches/stats/c1");
             }
