@@ -24,6 +24,30 @@ export default function NewBatchContent() {
     handleFileUpload(uploadedFile);
   };
 
+  const handleSubmit = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("/api/batch/new", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(students),
+      });
+
+      if (response.ok) {
+      } else {
+        const data = await response.json();
+        setError(data.message || "Something went wrong!");
+      }
+    } catch (err) {
+      setError("Failed to upload. Please try again later.");
+    }
+  };
+
   const handleFileUpload = (uploadedFile: File) => {
     if (uploadedFile && uploadedFile.type === "text/csv") {
       setFile(uploadedFile);
@@ -129,6 +153,7 @@ export default function NewBatchContent() {
               ))}
             </tbody>
           </table>
+          <button onClick={handleSubmit}>Submit</button>
         </div>
       )}
     </div>
