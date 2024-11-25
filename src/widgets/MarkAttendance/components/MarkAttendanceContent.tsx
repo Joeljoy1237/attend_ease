@@ -16,6 +16,7 @@ export default function MarkAttendanceContent() {
   const [students, setStudents] = useState<Student[] | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [batchName, setBatchName] = useState("");
 
   const { division } = useParams();
 
@@ -74,11 +75,28 @@ export default function MarkAttendanceContent() {
 
   useEffect(() => {
     fetchStudents();
+    if (division === "b2") {
+      setBatchName("Second Year Biology Science");
+    }else if (division === "b1") {
+      setBatchName("First Year Biology Science");
+    }else if (division === "c2") {
+      setBatchName("Second Year Computer Science");
+    }else if (division === "c1") {
+      setBatchName("First Year Computer Science");
+    }else if (division === "e2") {
+      setBatchName("Second Year Commerce");
+    }else if (division === "e1") {
+      setBatchName("First Year Commerce");
+    }else if (division === "h2") {
+      setBatchName("Second Year Humanities");
+    }else if (division === "h1") {
+      setBatchName("First Year Humanities");
+    }
   }, []);
 
   return (
     <div className="p-6 bg-white flex flex-col gap-8">
-      <TitleBar title="Mark Attendance" />
+      <TitleBar title="Mark Attendance" subTile={batchName} />
       <div className="flex space-x-4 mb-6">
         <button
           className={`px-4 py-2 rounded-lg ${
