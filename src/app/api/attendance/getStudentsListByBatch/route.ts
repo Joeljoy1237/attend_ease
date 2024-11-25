@@ -18,7 +18,7 @@ export async function POST(request: Request) {
         await connectToDB();
 
         // Query to find students based on the batch code
-        const students = await Student.find({ division:batchCode }).select("-__v -_id"); // Exclude unnecessary fields
+        const students = await Student.find({ division: batchCode }).select("-__v -_id"); // Exclude unnecessary fields
 
         // Return the response
         return new Response(JSON.stringify({ students }), { status: 200 });
