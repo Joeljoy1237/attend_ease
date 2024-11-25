@@ -38,7 +38,7 @@ export default function DashboardLyout({
           <SideBar />
           <div className="flex flex-col">
             <TopBar />
-            <main className="min-h-[110vh] h-auto rounded-[5px] pt-[17vh] pl-[17vw] pr-[2vw] pb-[1vw] w-[99.5vw] flex items-center justify-center bg-azure-50 ">
+            <main className="min-h-[100vh] h-auto rounded-[5px] pt-[17vh] pl-[17vw] pr-[2vw] pb-[1vw] w-[99.5vw] flex items-center justify-center bg-azure-50 ">
               <Suspense
                 fallback={<div className="w-full h-full">loading...</div>}
               >

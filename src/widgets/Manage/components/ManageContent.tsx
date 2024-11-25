@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import BatchItem from "@components/BatchItem";
 import TitleBar from "@components/TitleBar";
 import React, { useEffect, useState } from "react";
@@ -26,7 +26,7 @@ export default function ManageContent() {
   };
 
   return (
-    <div className="bg-white w-full h-full rounded-[5px] p-6">
+    <div className="bg-white w-full h-auto rounded-[5px] p-6">
       <div className="flex flex-col space-y-6">
         <div className="flex flex-row items-center justify-between">
           <TitleBar title="All batches" />
@@ -67,60 +67,40 @@ export default function ManageContent() {
           </div>
         </div>
         <div className="w-full h-[1px] bg-gray-300"></div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full border border-gray-200 divide-y divide-gray-200">
-            <thead className="bg-azure-50 h-[50px]">
-              <tr>
-                <th className="px-4 py-2 text-left text-base font-medium text-azure-600">
-                  Sl No.
-                </th>
-                <th className="px-4 py-2 text-left text-base font-medium text-azure-600">
-                  Roll no.
-                </th>
-                <th className="px-4 py-2 text-left text-base font-medium text-azure-600">
-                  Name
-                </th>
-                <th className="px-4 py-2 text-left text-base font-medium text-azure-600">
-                  Admission No.
-                </th>
-                <th className="px-4 py-2 text-left text-base font-medium text-azure-600">
-                  Class
-                </th>
-                <th className="px-4 py-2 text-center text-base font-medium text-azure-600">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {studentData!.map((student: any, index) => (
-                <tr key={index} id={student._id} className="h-[2rem]">
-                  <td className="px-4 py-2 text-base text-gray-700">
-                    {index+1}
-                  </td>
-                  <td className="px-4 py-2 text-base text-gray-700">
-                    {student.rollNo}
-                  </td>
-                  <td className="px-4 py-2 text-base text-gray-700">
-                    {student.name}
-                  </td>
-                  <td className="px-4 py-2 text-base text-gray-700">
-                    {student.admnNo}
-                  </td>
-                  <td className="px-4 py-2 text-base text-gray-700">
-                    {student.branch}
-                  </td>
-                  <td className="px-4 py-2 text-center flex items-center justify-center">
-                    <button className="text-blue-500 hover:text-blue-700">
-                      <FiEdit className="text-xl" />
-                    </button>
-                    <button className="text-red-500 hover:text-red-700 ml-2">
-                      <MdOutlineDelete className="text-2xl" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+
+        {/* Custom Scrollable Div Table */}
+        <div>
+          <div className="flex bg-azure-50 p-1">
+            <div className="flex-1 px-4 py-2 text-left text-base font-medium text-azure-600">Sl No.</div>
+            <div className="flex-1 px-4 py-2 text-left text-base font-medium text-azure-600">Roll no.</div>
+            <div className="flex-1 px-4 py-2 text-left text-base font-medium text-azure-600">Name</div>
+            <div className="flex-1 px-4 py-2 text-left text-base font-medium text-azure-600">Admission No.</div>
+            <div className="flex-1 px-4 py-2 text-left text-base font-medium text-azure-600">Class</div>
+            <div className="flex-1 px-4 py-2 text-center text-base font-medium text-azure-600">Actions</div>
+          </div>
+          <div className="overflow-y-auto" style={{ maxHeight: "42vh" }}>
+            {studentData!.map((student: any, index) => (
+              <div
+                key={index}
+                id={student._id}
+                className="flex items-center border-b border-gray-200 p-2"
+              >
+                <div className="flex-1 px-4 py-2 text-base text-gray-700">{index + 1}</div>
+                <div className="flex-1 px-4 py-2 text-base text-gray-700">{student.rollNo}</div>
+                <div className="flex-1 px-4 py-2 text-base text-gray-700">{student.name}</div>
+                <div className="flex-1 px-4 py-2 text-base text-gray-700">{student.admnNo}</div>
+                <div className="flex-1 px-4 py-2 text-base text-gray-700">{student.branch}</div>
+                <div className="flex-1 px-4 py-2 text-center flex items-center justify-center">
+                  <button className="text-blue-500 hover:text-blue-700">
+                    <FiEdit className="text-xl" />
+                  </button>
+                  <button className="text-red-500 hover:text-red-700 ml-2">
+                    <MdOutlineDelete className="text-2xl" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
