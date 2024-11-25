@@ -27,7 +27,7 @@ export default function MarkAttendanceContent() {
     const data = fetch("/api/attendance/markAttendance", {
       method: "POST",
       body: JSON.stringify({
-        date: "2024-11-25",
+        date: "2024-11-24",
         data: attendance,
         batchCode: division,
       }),
@@ -61,15 +61,17 @@ export default function MarkAttendanceContent() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ date: "2024-11-25", batchCode: division }),
+        body: JSON.stringify({ date: "2024-11-24", batchCode: division }),
       });
 
       if (!response.ok) {
         throw new Error("Failed to fetch attendance.");
       }
-      const data = await response.json();
-      console.log(data);
-      setAttendance(data);
+      if (response.status === 200) {
+        const data = await response.json();
+        console.log(data);
+        setAttendance(data);
+      }
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
     } finally {
@@ -96,6 +98,7 @@ export default function MarkAttendanceContent() {
       }
 
       const data = await response.json();
+      console.log(data);
       const newAttendance = data.students.reduce((acc: any, student: any) => {
         acc[student.rollNo] = true;
         return acc;
