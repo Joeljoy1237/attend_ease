@@ -1,13 +1,12 @@
 "use client";
 import { sideBarMenu } from "@utils/constants";
-import { signOut } from "firebase/auth";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { FiLogOut } from "react-icons/fi";
-import { auth } from "../../../config/firebaseConfig";
 import customToast from "@components/CustomToast";
+import { signOut } from "next-auth/react";
 
 export default function SideBar() {
   const userRole = "admin"; // Example role, dynamically fetched in real use
@@ -20,7 +19,10 @@ export default function SideBar() {
   return (
     <div className="w-[15vw] h-screen pt-[2rem] fixed bg-white">
       <div className="w-full h-full relative">
-        <Link href={'/dashboard/home'} className="flex-[0.5] flex items-center justify-center">
+        <Link
+          href={"/dashboard/home"}
+          className="flex-[0.5] flex items-center justify-center"
+        >
           <Image src={"/logo/logo.svg"} alt="" width={130} height={150} />
         </Link>
         <div className="sidebar mt-[60px] space-y-2">
@@ -67,13 +69,12 @@ export default function SideBar() {
         <div className="absolute bottom-0 w-full px-[1vw] pb-[2vh] flex flex-col gap-2 items-center justify-center">
           <button
             onClick={() => {
-              signOut(auth);
+              signOut();
               customToast({
                 message: "Logout successfull",
                 type: "success",
                 desc: "Redirecting to login page",
               });
-              console.log(auth.currentUser);
             }}
             className="rounded-[10px] flex items-center justify-center gap-3 bg-red-100 w-full p-3 text-red-600 font-semibold"
           >

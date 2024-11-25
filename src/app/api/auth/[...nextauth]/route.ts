@@ -27,13 +27,13 @@ const handler = NextAuth({
         await connectToDB();
 
         if (!credentials) {
-          throw new Error(JSON.stringify({ message: "Credentials not provided", desc: "Please provide both email and password" }));
+          throw new Error(JSON.stringify({ message: "Credentials not provided", desc: "Kindly provide both email and password" }));
         }
 
         try {
           const userExist = await User.findOne({ email: credentials.email });
           if (!userExist) {
-            throw new Error(JSON.stringify({ message: "User does not exist", desc: "Please check the email and try again" }));
+            throw new Error(JSON.stringify({ message: "User does not exist", desc: "Kindly check your email and try again" }));
           }
 
           const bytes = CryptoJS.AES.decrypt(userExist.password, process.env.CRYPTO_SECRET_KEY!);
@@ -42,10 +42,10 @@ const handler = NextAuth({
           if (isMatch) {
             return userExist; // Return user object if authentication is successful
           } else {
-            throw new Error(JSON.stringify({ message: "Email or Password is not correct", desc: "Please check your credentials and try again" }));
+            throw new Error(JSON.stringify({ message: "Invalid credentials", desc: "Kindly check your credentials" }));
           }
         } catch (err: any) {
-          throw new Error(JSON.stringify({ message: "Internal Server Error", desc: "An unexpected error occurred. Please try again later." }));
+            throw err; // Re-throw custom error
         }
       },
     }),

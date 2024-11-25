@@ -1,15 +1,30 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import customToast from "@components/CustomToast";
 import { useRouter } from "next/navigation";
+
+type Error = {
+  message: string; // Your custom error type
+  desc: string;
+};
+
+type SignInResponse = {
+  error: string | null; // Error message, if any
+  ok: boolean; // Whether the sign-in was successful
+  status: number; // HTTP status code
+  url: string | null; // Redirect URL (if any)
+};
 
 export default function LoginContent() {
   const { data: session, status } = useSession();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<Error>({
+    message: "",
+    desc: "",
+  });
   const router = useRouter();
   useEffect(() => {
     console.log(status);
@@ -22,7 +37,7 @@ export default function LoginContent() {
     e.preventDefault();
     try {
       console.log("called");
-      const res = await signIn("credentials", {
+      const res: SignInResponse | undefined = await signIn("credentials", {
         email: email,
         password: password,
         redirect: false,
@@ -34,12 +49,24 @@ export default function LoginContent() {
           message: "Login Successful",
           desc: "Redirecting to the dashboard",
         });
+      } else {
+        throw res?.error;
       }
-    } catch (error: any) {
-      setError(error.code); // Extract and set the error message
+    } catch (err: any) {
+      const newError = err
+        ? JSON.parse(err)
+        : {
+            message: "An unknown error occurred",
+            desc: "Please try again later.",
+          };
+      setError({
+        message: newError.message || "An unknown error occurred",
+        desc: newError.desc || "Please try again later.",
+      });
       customToast({
         type: "error",
-        message: error.message || "An error occurred. Please try again.",
+        message: newError.message || "An error occurred. Please try again.",
+        desc: newError.desc || "An error occurred. Please try again.",
       });
     }
   };
