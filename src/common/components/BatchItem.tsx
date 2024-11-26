@@ -51,7 +51,7 @@ console.log(batchName)
             if (location === "/dashboard/attendance") {
               router.push(`/dashboard/attendance/${batchCode}/mark-attendance/today`);
             } else {
-              router.push("/dashboard/batches/stats/c1");
+              router.push(`/dashboard/batches/stats/${batchCode}`);
             }
           }}
           className="bg-azure-600 w-full text-white font-medium p-2 outline-none border-none rounded-[7px]"
@@ -65,14 +65,14 @@ console.log(batchName)
             if (location === "/dashboard/attendance") {
               router.push(`/dashboard/attendance/${batchCode}/mark-attendance/custom-date`);
             } else {
-              router.push("/dashboard/batches/stats/c1");
+              router.push(`/dashboard/batches/${batchCode}/date-chart`);
             }
           }}
           className="bg-azure-50 w-full text-azure-600 font-medium p-2 outline-none border-none rounded-[7px]"
         >
           {location === "/dashboard/attendance"
             ? "Custom date"
-            : " View Attendance Stats"}
+            : "View Date Chart"}
         </button>
       </div>
     </div>

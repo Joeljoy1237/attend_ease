@@ -26,6 +26,7 @@ const AttendanceItem: React.FC<AttendanceProps> = ({
     const dayName = new Intl.DateTimeFormat("en-GB", { weekday: "long" }).format(dateObj);
     return `${formattedDate} - ${dayName}`;
   };
+  console.log(isPresentFull)
 
   return (
     <div className="attendance-item p-4 rounded-md shadow-sm w-[280px] bg-white bg-opacity-20 border-[1px] border-azure-100 h-[160px] flex flex-col justify-between">

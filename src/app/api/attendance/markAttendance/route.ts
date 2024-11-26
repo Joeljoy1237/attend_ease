@@ -33,8 +33,6 @@ export async function POST(request: Request) {
                 { status: 400 }
             );
         }
-
-
         // Create a new attendance entry
         const attendance = new Attendance({
             date: parsedDate,

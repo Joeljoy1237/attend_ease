@@ -25,7 +25,26 @@ export default function MarkAttendanceContent() {
   const [confirmationModal, setConfirmationModal] = useState<boolean>(false);
   const { division, type } = useParams();
   const router = useRouter();
-
+  const [batchName, setBatchName] = useState("");
+  useEffect(() => {
+    if (division === "b1") {
+      setBatchName("First Year Biology Science");
+    } else if (division === "b2") {
+      setBatchName("Second Year Biology Science");
+    } else if (division === "c2") {
+      setBatchName("Second Year Computer Science");
+    } else if (division === "c1") {
+      setBatchName("First Year Computer Science");
+    } else if (division === "e1") {
+      setBatchName("First Year Commerce");
+    } else if (division === "e2") {
+      setBatchName("Second Year Commerce");
+    } else if (division === "h1") {
+      setBatchName("First Year Humanities");
+    } else if (division === "h2") {
+      setBatchName("Second Year Humanities");
+    }
+  }, []);
   const handleDataSubmit = async () => {
     try {
       if (activeTab === "rollNo" && !attendance) {
@@ -188,7 +207,10 @@ export default function MarkAttendanceContent() {
   return (
     <div className="p-6 bg-white flex flex-col gap-8">
       <div className="flex w-full justify-between">
-        <TitleBar title="Mark Attendance" />
+        <TitleBar
+          title="Mark Attendance"
+          subTile={`${division} - ${batchName}`}
+        />
         {type === "today" ? (
           <button
             onClick={() =>
