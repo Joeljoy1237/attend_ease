@@ -4,22 +4,56 @@ import TitleBar from "@components/TitleBar";
 import React, { useEffect, useState } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { LuRefreshCcw } from "react-icons/lu";
+
+type Batch = {
+  division: string;
+  branch: string;
+};
+
 export default function AttendanceContent() {
-  const [batchData, setBatchData] = useState([]);
   const [count, setCount] = useState(0);
+  const [batchData, setBatchData] = useState<Batch[]>([]);
+  const [filteredBatchData, setFilteredBatchData] = useState<Batch[]>([]);
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchBatchCount();
-  }, []);
+  }, [sortOrder]);
 
   const fetchBatchCount = async () => {
-    const res = await fetch("/api/batch/count");
+    const requestBody = {
+      sortOrder, // or "desc" depending on the required sorting order
+    };
+
+    const res = await fetch("/api/batch/count", {
+      method: "POST", // Changed to POST
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody), // Include the request body
+    });
 
     if (res.ok) {
       const data = await res.json();
-      setCount(data.data.length);
-      setBatchData(data.data);
+      setBatchData(data.data); // Update state with the fetched data
+      setFilteredBatchData(data.data); // Update filtered data as well
     }
+  };
+
+  useEffect(() => {
+    const filtered = batchData.filter(
+      (batch) =>
+        batch.division.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        batch.branch.toLowerCase().includes(searchQuery.toLowerCase())
+      // batch.branch.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      // batch.rollNo.toString().includes(searchQuery)
+    );
+    setFilteredBatchData(filtered);
+  }, [searchQuery]);
+
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortOrder(e.target.value);
   };
   return (
     <div className="bg-white w-full h-full rounded-[5px] p-6">
@@ -32,6 +66,9 @@ export default function AttendanceContent() {
             <div className="bg-azure-50 flex flex-row items-center rounded-[50px] px-2">
               <IoSearchOutline className="text-2xl text-azure-600" />
               <input
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+              }}
                 type="text"
                 className="w-full bg-azure-50 py-3 px-2 rounded-[50px] outline-none border-none placeholder:text-azure-600"
                 placeholder="Search by batch code, name ...."
@@ -40,11 +77,14 @@ export default function AttendanceContent() {
           </div>
           <div className="flex-[2] flex items-center justify-end gap-5">
             <div className="bg-azure-50 rounded-[10px] p-2">
-              <span className="text-azure-600">Items count: {count}</span>
+              <span className="text-azure-600">Items count: {filteredBatchData?.length}</span>
             </div>
             {/* Dropdown for Sorting */}
             <div className="relative">
-              <select className="px-4 py-2 text-white bg-azure-600 rounded-md outline-none appearance-none cursor-pointer">
+              <select
+                onChange={handleSortChange}
+                className="px-4 py-2 text-white bg-azure-600 rounded-md outline-none appearance-none cursor-pointer"
+              >
                 <option value="asc">Sort: Ascending</option>
                 <option value="desc">Sort: Descending</option>
               </select>
@@ -58,7 +98,7 @@ export default function AttendanceContent() {
         </div>
         <div className="w-full h-[1px] bg-gray-300"></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {batchData!.map((batch: any, index) => (
+          {filteredBatchData!.map((batch: any, index) => (
             <BatchItem
               key={index}
               batchCode={batch.division}

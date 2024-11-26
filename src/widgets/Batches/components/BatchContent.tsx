@@ -8,28 +8,38 @@ import { FaCirclePlus } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 
 type Batch = {
-  division:string;
-  branch:string;
+  division: string;
+  branch: string;
 };
-
 
 export default function BatchContent() {
   const [batchData, setBatchData] = useState<Batch[]>([]);
   const [filteredBatchData, setFilteredBatchData] = useState<Batch[]>([]);
+  const [sortOrder, setSortOrder] = useState("asc");
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
 
   useEffect(() => {
     fetchBatchCount();
-  }, []);
-console.log(filteredBatchData)
+  }, [sortOrder]);
+
   const fetchBatchCount = async () => {
-    const res = await fetch("/api/batch/count");
+    const requestBody = {
+      sortOrder, // or "desc" depending on the required sorting order
+    };
+
+    const res = await fetch("/api/batch/count", {
+      method: "POST", // Changed to POST
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody), // Include the request body
+    });
 
     if (res.ok) {
       const data = await res.json();
-      setBatchData(data.data);
-      setFilteredBatchData(data.data)
+      setBatchData(data.data); // Update state with the fetched data
+      setFilteredBatchData(data.data); // Update filtered data as well
     }
   };
 
@@ -38,11 +48,13 @@ console.log(filteredBatchData)
       (batch) =>
         batch.division.toLowerCase().includes(searchQuery.toLowerCase()) ||
         batch.branch.toLowerCase().includes(searchQuery.toLowerCase())
-        // batch.branch.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        // batch.rollNo.toString().includes(searchQuery)
     );
     setFilteredBatchData(filtered);
   }, [searchQuery]);
+
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortOrder(e.target.value);
+  };
 
   return (
     <div className="bg-white w-full h-full rounded-[5px] p-6">
@@ -77,11 +89,14 @@ console.log(filteredBatchData)
           </div>
           <div className="flex-[2] flex items-center justify-end gap-5">
             <div className="bg-azure-50 rounded-[10px] p-2">
-              <span className="text-azure-600">Items count: 13</span>
+              <span className="text-azure-600">Items count: {filteredBatchData.length}</span>
             </div>
             {/* Dropdown for Sorting */}
             <div className="relative">
-              <select className="px-4 py-2 text-white bg-azure-600 rounded-md outline-none appearance-none cursor-pointer">
+              <select
+                onChange={handleSortChange}
+                className="px-4 py-2 text-white bg-azure-600 rounded-md outline-none appearance-none cursor-pointer"
+              >
                 <option value="asc">Sort: Ascending</option>
                 <option value="desc">Sort: Descending</option>
               </select>
