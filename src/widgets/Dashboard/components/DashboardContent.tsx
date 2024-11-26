@@ -3,6 +3,16 @@ import React, { useEffect, useState } from "react";
 import AttendanceItem from "@components/AttendanceItem";
 import TitleBar from "@components/TitleBar";
 
+type TodaysStats = {
+  attendanceChange:string
+  absenteeChange:string;
+  todaysAbsentCount: number;
+  todaysPresentCount: number;
+  totalStudentsCount: number;
+  yesterdaysAbsentCount: number;
+  yesterdaysPresentCount: number;
+};
+
 export default function DashboardContent() {
   const [attendanceHistory, setAttendanceHistory] = useState<any[]>([]); // Store fetched attendance data
   const [loading, setLoading] = useState<boolean>(true); // Track loading state
@@ -12,6 +22,7 @@ export default function DashboardContent() {
   const [yesterdayPresent, setYesterdayPresent] = useState<number>(0); // Yesterday's present count
   const [presentChange, setPresentChange] = useState<number>(0); // Percentage change for present
   const [absentChange, setAbsentChange] = useState<number>(0); // Percentage change for absent
+  const [todaysStats, setTodaysStats] = useState<TodaysStats | undefined>(undefined);
 
   const fetchAttendanceHistory = async () => {
     try {
@@ -77,8 +88,22 @@ export default function DashboardContent() {
     }
   };
 
+  const fetchTodaysStats = async () => {
+    try {
+      const response = await fetch("/api/attendance/getTodaysStats", {
+        method: "POST",
+      }); // Make the API request
+      const data = await response.json();
+      setTodaysStats(data)
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     fetchAttendanceHistory();
+    fetchTodaysStats();
   }, []);
 
   return (
@@ -99,15 +124,12 @@ export default function DashboardContent() {
           </div>
           <div className="">
             <span className="text-4xl text-azure-600 font-semibold">
-              {todayPresent}
+              {todaysStats?.todaysPresentCount}
             </span>
           </div>
           <div className="">
             <span className="text-gray-500 text-sm">
-              {presentChange >= 0
-                ? `${Math.abs(presentChange).toFixed(1)}% increase`
-                : `${Math.abs(presentChange).toFixed(1)}% decrease`}{" "}
-              than yesterday
+            {todaysStats?.attendanceChange}
             </span>
           </div>
         </div>
@@ -125,15 +147,12 @@ export default function DashboardContent() {
           </div>
           <div className="">
             <span className="text-4xl text-red-600 font-semibold">
-              {totalStudent - todayPresent}
+              {todaysStats?.todaysAbsentCount}
             </span>
           </div>
           <div className="">
             <span className="text-gray-500 text-sm">
-              {absentChange >= 0
-                ? `${Math.abs(absentChange).toFixed(1)}% increase`
-                : `${Math.abs(absentChange).toFixed(1)}% decrease`}{" "}
-              than yesterday
+              {todaysStats?.absenteeChange}
             </span>
           </div>
         </div>

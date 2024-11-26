@@ -19,7 +19,10 @@ export async function POST(request: Request) {
             );
         }
 
-        // Group attendance counts by date
+        // Get today's date in the format "YYYY-MM-DD"
+        const currentDate = new Date().toISOString().split('T')[0];
+
+        // Group attendance counts by date, excluding the current date
         const groupedAttendance = attendanceRecords.reduce((acc, record) => {
             const attendanceValues = Array.from(record.data.values());
 
@@ -27,8 +30,11 @@ export async function POST(request: Request) {
                 (status) => status === true
             ).length;
 
-            // Format date to ensure proper grouping (optional)
+            // Format record date to "YYYY-MM-DD" for comparison
             const formattedDate = new Date(record.date).toISOString().split('T')[0];
+
+            // Exclude the current date
+            if (formattedDate === currentDate) return acc;
 
             if (!acc[formattedDate]) {
                 acc[formattedDate] = {
