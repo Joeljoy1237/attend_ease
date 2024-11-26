@@ -42,7 +42,7 @@ export default function DashboardLyout({
               <Suspense
                 fallback={<div className="w-full h-full">loading...</div>}
               >
-                <div className="w-full h-full">{children}</div>
+                <div className="w-full h-full relative">{children}</div>
               </Suspense>
             </main>
           </div>

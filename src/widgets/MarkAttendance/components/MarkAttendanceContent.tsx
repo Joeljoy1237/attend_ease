@@ -1,6 +1,7 @@
 "use client";
+import customToast from "@components/CustomToast";
 import TitleBar from "@components/TitleBar";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface Student {
@@ -18,20 +19,54 @@ export default function MarkAttendanceContent() {
   const [students, setStudents] = useState<Student[] | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [todaysDate, setTodaysDate] = useState<Date | null>(null);
+  const [confirmationModal, setConfirmationModal] = useState<boolean>(false);
+  const { division, type } = useParams();
+  const router = useRouter();
 
-  const { division } = useParams();
+  const handleDataSubmit = async () => {
+    try {
+      if (activeTab === "rollNo" && !attendance) {
+        throw { message: "Please enter somthing" };
+      }
+      const res: Response = await fetch("/api/attendance/markAttendance", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          date:
+            type === "custom-date"
+              ? selectedDate?.toISOString().split("T")[0]
+              : todaysDate?.toISOString().split("T")[0],
+          data: attendance,
+          batchCode: division,
+        }),
+      });
 
-  const handleDataSubmit = () => {
-    console.log(attendance);
-    console.log(students);
-    const data = fetch("/api/attendance/markAttendance", {
-      method: "POST",
-      body: JSON.stringify({
-        date: "2024-11-24",
-        data: attendance,
-        batchCode: division,
-      }),
-    });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw errorData;
+      }
+
+      const responseData = await res.json();
+      console.log("Success:", responseData);
+      customToast({
+        message: "Attendance marked successfully!",
+        type: "success",
+      });
+    } catch (error: any) {
+      console.log("Error:", error);
+
+      // Show error toast with the error message
+      customToast({
+        message: error.message || "An unexpected error occurred.",
+        desc: error.desc,
+        type: "error",
+      });
+    }
   };
 
   const handleCheckListChange = (rollNo: string, isChecked: boolean) => {
@@ -49,8 +84,17 @@ export default function MarkAttendanceContent() {
       }));
 
       setRollNo(""); // Clear input after marking attendance
+    } else if (rollNo === "") {
+      customToast({
+        message: "Kindly enter a roll number",
+        type: "error",
+      });
     } else {
-      console.error("Invalid Roll Number");
+      customToast({
+        message: "Invalid roll number",
+        type: "error",
+        desc: "Kindly check the roll number",
+      });
     }
   };
 
@@ -117,41 +161,104 @@ export default function MarkAttendanceContent() {
     fetchAttendance();
   }, []);
 
-  // Filter the absent students
   const absentStudents = students?.filter(
     (student) => !attendance[student.rollNo]
   );
 
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  useEffect(() => {
+    if (type === "custom-date") {
+      setIsModalOpen(true);
+    } else if (type === "today") {
+      const todaysDate = new Date();
+
+      setTodaysDate(todaysDate);
+      console.log(todaysDate); // For debugging, you can see the formatted date in the console
+    }
+  }, [type]);
+
   return (
     <div className="p-6 bg-white flex flex-col gap-8">
-      <TitleBar title="Mark Attendance" />
-      <div className="flex space-x-4 mb-6">
-        <button
-          className={`px-4 py-2 rounded-lg ${
-            activeTab === "rollNo"
-              ? "bg-azure-600 text-white"
-              : "bg-azure-100 text-azure-600"
-          }`}
-          onClick={() => setActiveTab("rollNo")}
-        >
-          Roll No Method
-        </button>
-        <button
-          className={`px-4 py-2 rounded-lg ${
-            activeTab === "checkList"
-              ? "bg-azure-600 text-white"
-              : "bg-azure-100 text-azure-600"
-          }`}
-          onClick={() => setActiveTab("checkList")}
-        >
-          Check List Method
-        </button>
+      <div className="flex w-full justify-between">
+        <TitleBar title="Mark Attendance" />
+        {type === "today" ? (
+          <button
+            onClick={() =>
+              router.push(
+                `/dashboard/attendance/${division}/mark-attendance/custom-date`
+              )
+            }
+            className="bg-azure-600 text-white px-4 py-2 rounded-lg"
+          >
+            Go for Custom date
+          </button>
+        ) : (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-azure-600 text-white px-4 py-2 rounded-lg"
+          >
+            {selectedDate ? "Change date" : "Select Date"}
+          </button>
+        )}
+      </div>
+      <div className="flex flex-row items-center justify-between mb-1">
+        <div className="flex space-x-4">
+          <button
+            className={`px-4 py-2 rounded-lg ${
+              activeTab === "rollNo"
+                ? "bg-azure-600 text-white"
+                : "bg-azure-100 text-azure-600"
+            }`}
+            onClick={() => setActiveTab("rollNo")}
+          >
+            Roll No Method
+          </button>
+          <button
+            className={`px-4 py-2 rounded-lg ${
+              activeTab === "checkList"
+                ? "bg-azure-600 text-white"
+                : "bg-azure-100 text-azure-600"
+            }`}
+            onClick={() => setActiveTab("checkList")}
+          >
+            Check List Method
+          </button>
+        </div>
+        {selectedDate && !isModalOpen && (
+          <div className="">
+            <p className="mt-2 text-gray-600 text-sm">
+              Selected Date:{" "}
+              <span className="text-azure-600 text-base font-semibold">
+                {" "}
+                {formatDate(selectedDate)}
+              </span>
+            </p>
+          </div>
+        )}
+        {todaysDate && (
+          <div className="">
+            <p className="mt-2 text-gray-600 text-sm">
+              Todays Date:{" "}
+              <span className="text-azure-600 text-base font-semibold">
+                {" "}
+                {formatDate(todaysDate)}
+              </span>
+            </p>
+          </div>
+        )}
       </div>
 
-      {/* Tab Content */}
       {activeTab === "rollNo" && (
         <div>
-          <h2 className="text-xl font-semibold mt-6 mb-4">
+          <h2 className="text-xl font-semibold mb-4">
             Enter Absentees Roll Number
           </h2>
           <input
@@ -193,7 +300,7 @@ export default function MarkAttendanceContent() {
 
       {activeTab === "checkList" && (
         <div className="flex flex-col gap-5">
-          <h2 className="text-xl font-semibold mb-4 flex flex-col">
+          <h2 className="text-xl font-semibold mb-1 flex flex-col">
             Check List
           </h2>
           <ul className="space-y-2 grid">
@@ -218,11 +325,70 @@ export default function MarkAttendanceContent() {
         </div>
       )}
       <button
-        onClick={handleDataSubmit}
+        onClick={() => {
+          setConfirmationModal(true);
+        }}
         className="bg-azure-600 text-white px-4 py-2 rounded-lg"
       >
         Submit
       </button>
+
+      {isModalOpen && (
+        <div className="absolute w-full h-full inset-0 bg-azure-100 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-lg font-semibold mb-4">Select a Date</h2>
+            <input
+              type="date"
+              onChange={(e) => setSelectedDate(new Date(e.target.value))}
+              className="w-full border px-4 py-2 rounded-lg"
+            />
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-azure-600 text-white px-4 py-2 rounded-lg"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmationModal && (
+        <div
+          onClick={() => {
+            setConfirmationModal(false);
+          }}
+          className="absolute w-full h-full inset-0 bg-azure-100 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-50"
+        >
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-lg font-semibold mb-4">Select a Date</h2>
+            <div className="">
+              <span className="">Are you sure you want to continue ?</span>
+            </div>
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDataSubmit}
+                className="bg-azure-600 text-white px-4 py-2 rounded-lg"
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

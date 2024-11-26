@@ -19,21 +19,30 @@ export async function POST(request: Request) {
             );
         }
 
-        // Calculate attendance counts for each date
-        const attendanceCounts = attendanceRecords.map((record) => {
-
+        // Group attendance counts by date
+        const groupedAttendance = attendanceRecords.reduce((acc, record) => {
             const attendanceValues = Array.from(record.data.values());
-
 
             const presentCount = attendanceValues.filter(
                 (status) => status === true
             ).length;
 
-            return {
-                date: record.date,
-                presentCount,
-            };
-        });
+            // Format date to ensure proper grouping (optional)
+            const formattedDate = new Date(record.date).toISOString().split('T')[0];
+
+            if (!acc[formattedDate]) {
+                acc[formattedDate] = {
+                    date: formattedDate,
+                    presentCount: 0,
+                };
+            }
+
+            acc[formattedDate].presentCount += presentCount;
+            return acc;
+        }, {});
+
+        // Convert groupedAttendance to an array
+        const attendanceCounts = Object.values(groupedAttendance);
 
         // Return the result
         return new Response(

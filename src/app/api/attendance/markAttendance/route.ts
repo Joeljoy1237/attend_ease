@@ -5,8 +5,14 @@ export async function POST(request: Request) {
     try {
         const { date, data, batchCode } = await request.json();
 
-        // Validate the date
-        const parsedDate = new Date(date);
+        // Validate the input date
+        if (!date) {
+            throw { message: "No date provided", desc: "Kindly choose a date.", status: 400 }
+        }
+
+        const parsedDate = new Date(date); // Assuming 'date' is a valid Date string or object
+        const formattedDate = parsedDate.toDateString(); // Outputs: "Tue Nov 26 2024"
+        console.log(formattedDate);
 
         // Connect to the database
         await connectToDB();
@@ -18,32 +24,32 @@ export async function POST(request: Request) {
         });
 
         if (existingAttendance) {
-            // Update the existing attendance record
-            existingAttendance.data = data;
-            await existingAttendance.save();
-            return new Response(
-                JSON.stringify({ message: "Attendance updated successfully" }),
-                { status: 200 }
-            );
-        } else {
-            // Create a new attendance entry if no existing record is found
-            const attendance = new Attendance({
-                date: parsedDate,
-                data: data,
-                division: batchCode,
-            });
-
-            await attendance.save();
-            return new Response(
-                JSON.stringify({ message: "Marked Successfully" }),
-                { status: 200 }
+            const upperCaseBatchCode = batchCode.toUpperCase();
+            return Response.json(
+                {
+                    message: `${upperCaseBatchCode} attendance already marked`,
+                    desc: `${formattedDate} is already marked`
+                },
+                { status: 400 }
             );
         }
-    } catch (err) {
+
+
+        // Create a new attendance entry
+        const attendance = new Attendance({
+            date: parsedDate,
+            data,
+            division: batchCode,
+        });
+
+        await attendance.save();
+        return Response.json({ message: "Marked Successfully" }, { status: 200 });
+    } catch (err: any) {
         console.error(err);
-        return new Response(
-            JSON.stringify({ message: "Internal Server Error" }),
-            { status: 500 }
+        return Response.json(
+            { message: err.message || "Internal Server Error", desc: err.desc },
+            { status: err.status || 500 } // Default to 500 if err.status is undefined
         );
+
     }
 }

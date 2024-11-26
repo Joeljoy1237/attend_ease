@@ -45,11 +45,11 @@ console.log(batchName)
         </span>
       </div>
       <div className="h-[1px] w-full bg-gray-300"></div>
-      <div className="w-full">
+      <div className="w-full flex flex-col space-y-2">
         <button
           onClick={() => {
             if (location === "/dashboard/attendance") {
-              router.push(`/dashboard/attendance/${batchCode}/mark-attendance`);
+              router.push(`/dashboard/attendance/${batchCode}/mark-attendance/today`);
             } else {
               router.push("/dashboard/batches/stats/c1");
             }
@@ -57,7 +57,21 @@ console.log(batchName)
           className="bg-azure-600 w-full text-white font-medium p-2 outline-none border-none rounded-[7px]"
         >
           {location === "/dashboard/attendance"
-            ? " Mark Attendance"
+            ? " Mark Todays Attendance"
+            : " View Attendance Stats"}
+        </button>
+        <button
+          onClick={() => {
+            if (location === "/dashboard/attendance") {
+              router.push(`/dashboard/attendance/${batchCode}/mark-attendance/custom-date`);
+            } else {
+              router.push("/dashboard/batches/stats/c1");
+            }
+          }}
+          className="bg-azure-50 w-full text-azure-600 font-medium p-2 outline-none border-none rounded-[7px]"
+        >
+          {location === "/dashboard/attendance"
+            ? "Custom date"
             : " View Attendance Stats"}
         </button>
       </div>
