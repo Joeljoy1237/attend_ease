@@ -1,6 +1,6 @@
 "use client";
 import TitleBar from "@components/TitleBar";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface Student {
@@ -12,21 +12,27 @@ interface Student {
 export default function MarkAttendanceContent() {
   const [activeTab, setActiveTab] = useState<"rollNo" | "checkList">("rollNo");
   const [rollNo, setRollNo] = useState<string>("");
-  const [attendance, setAttendance] = useState<{ [key: string]: boolean }>({});
+  const [attendance, setAttendance] = useState<{
+    [key: string]: boolean;
+  }>({});
   const [students, setStudents] = useState<Student[] | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [batchName, setBatchName] = useState("");
 
   const { division } = useParams();
 
-  // Example student list for the "Check List" method
-  const studentList = [
-    { rollNo: "101", name: "Alice" },
-    { rollNo: "102", name: "Bob" },
-    { rollNo: "103", name: "Charlie" },
-    { rollNo: "104", name: "Diana" },
-  ];
+  const handleDataSubmit = () => {
+    console.log(attendance);
+    console.log(students);
+    const data = fetch("/api/attendance/markAttendance", {
+      method: "POST",
+      body: JSON.stringify({
+        date: "2024-11-24",
+        data: attendance,
+        batchCode: division,
+      }),
+    });
+  };
 
   const handleCheckListChange = (rollNo: string, isChecked: boolean) => {
     setAttendance((prev) => ({
@@ -36,12 +42,40 @@ export default function MarkAttendanceContent() {
   };
 
   const handleRollNoSubmit = () => {
-    if (rollNo.trim()) {
+    if (rollNo.trim() && rollNo in attendance) {
       setAttendance((prev) => ({
         ...prev,
-        [rollNo]: true,
+        [rollNo]: false,
       }));
+
       setRollNo(""); // Clear input after marking attendance
+    } else {
+      console.error("Invalid Roll Number");
+    }
+  };
+
+  const fetchAttendance = async () => {
+    try {
+      const response = await fetch("/api/attendance", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ date: "2024-11-24", batchCode: division }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch attendance.");
+      }
+      if (response.status === 200) {
+        const data = await response.json();
+        console.log(data);
+        setAttendance(data);
+      }
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,8 +98,13 @@ export default function MarkAttendanceContent() {
       }
 
       const data = await response.json();
-      setStudents(data.students);
       console.log(data);
+      const newAttendance = data.students.reduce((acc: any, student: any) => {
+        acc[student.rollNo] = true;
+        return acc;
+      }, {});
+      setAttendance(newAttendance);
+      setStudents(data.students);
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
     } finally {
@@ -75,28 +114,17 @@ export default function MarkAttendanceContent() {
 
   useEffect(() => {
     fetchStudents();
-    if (division === "b2") {
-      setBatchName("Second Year Biology Science");
-    }else if (division === "b1") {
-      setBatchName("First Year Biology Science");
-    }else if (division === "c2") {
-      setBatchName("Second Year Computer Science");
-    }else if (division === "c1") {
-      setBatchName("First Year Computer Science");
-    }else if (division === "e2") {
-      setBatchName("Second Year Commerce");
-    }else if (division === "e1") {
-      setBatchName("First Year Commerce");
-    }else if (division === "h2") {
-      setBatchName("Second Year Humanities");
-    }else if (division === "h1") {
-      setBatchName("First Year Humanities");
-    }
+    fetchAttendance();
   }, []);
+
+  // Filter the absent students
+  const absentStudents = students?.filter(
+    (student) => !attendance[student.rollNo]
+  );
 
   return (
     <div className="p-6 bg-white flex flex-col gap-8">
-      <TitleBar title="Mark Attendance" subTile={batchName} />
+      <TitleBar title="Mark Attendance" />
       <div className="flex space-x-4 mb-6">
         <button
           className={`px-4 py-2 rounded-lg ${
@@ -123,7 +151,9 @@ export default function MarkAttendanceContent() {
       {/* Tab Content */}
       {activeTab === "rollNo" && (
         <div>
-          <h2 className="text-xl font-semibold mb-4">Enter Roll Number</h2>
+          <h2 className="text-xl font-semibold mt-6 mb-4">
+            Enter Absentees Roll Number
+          </h2>
           <input
             type="text"
             value={rollNo}
@@ -135,8 +165,29 @@ export default function MarkAttendanceContent() {
             onClick={handleRollNoSubmit}
             className="bg-azure-600 text-white px-4 py-2 rounded-lg"
           >
-            Mark Attendance
+            Mark Absent
           </button>
+
+          <h2 className="text-xl font-semibold my-4">
+            Absentees (Roll Number Method)
+          </h2>
+          <ul className="space-y-2">
+            {absentStudents?.length ? (
+              absentStudents.map((student) => (
+                <li
+                  key={student.rollNo}
+                  className="flex items-center space-x-4"
+                >
+                  <span className="capitalize">
+                    {student.rollNo} - {student.name}
+                  </span>
+                  <span className="text-red-500 ml-2">Absent</span>
+                </li>
+              ))
+            ) : (
+              <li>No absentees marked.</li>
+            )}
+          </ul>
         </div>
       )}
 
@@ -164,14 +215,14 @@ export default function MarkAttendanceContent() {
               </li>
             ))}
           </ul>
-          <button
-            onClick={handleRollNoSubmit}
-            className="bg-azure-600 text-white px-4 py-2 rounded-lg"
-          >
-            Mark Attendance
-          </button>
         </div>
       )}
+      <button
+        onClick={handleDataSubmit}
+        className="bg-azure-600 text-white px-4 py-2 rounded-lg"
+      >
+        Submit
+      </button>
     </div>
   );
 }

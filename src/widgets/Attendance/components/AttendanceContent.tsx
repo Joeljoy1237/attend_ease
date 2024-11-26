@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import BatchItem from "@components/BatchItem";
 import TitleBar from "@components/TitleBar";
 import React, { useEffect, useState } from "react";
@@ -6,6 +6,7 @@ import { IoSearchOutline } from "react-icons/io5";
 import { LuRefreshCcw } from "react-icons/lu";
 export default function AttendanceContent() {
   const [batchData, setBatchData] = useState([]);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     fetchBatchCount();
@@ -16,6 +17,7 @@ export default function AttendanceContent() {
 
     if (res.ok) {
       const data = await res.json();
+      setCount(data.data.length);
       setBatchData(data.data);
     }
   };
@@ -38,7 +40,7 @@ export default function AttendanceContent() {
           </div>
           <div className="flex-[2] flex items-center justify-end gap-5">
             <div className="bg-azure-50 rounded-[10px] p-2">
-              <span className="text-azure-600">Items count: 13</span>
+              <span className="text-azure-600">Items count: {count}</span>
             </div>
             {/* Dropdown for Sorting */}
             <div className="relative">
@@ -56,7 +58,7 @@ export default function AttendanceContent() {
         </div>
         <div className="w-full h-[1px] bg-gray-300"></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {batchData!.map((batch: any, index) => (
+          {batchData!.map((batch: any, index) => (
             <BatchItem
               key={index}
               batchCode={batch.division}
