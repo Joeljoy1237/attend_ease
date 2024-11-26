@@ -7,23 +7,43 @@ import { LuRefreshCcw } from "react-icons/lu";
 import { FaCirclePlus } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 
+type Batch = {
+  division:string;
+  branch:string;
+};
+
+
 export default function BatchContent() {
-  const [batchData, setBatchData] = useState([]);
+  const [batchData, setBatchData] = useState<Batch[]>([]);
+  const [filteredBatchData, setFilteredBatchData] = useState<Batch[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     fetchBatchCount();
   }, []);
-
+console.log(filteredBatchData)
   const fetchBatchCount = async () => {
     const res = await fetch("/api/batch/count");
 
     if (res.ok) {
       const data = await res.json();
       setBatchData(data.data);
+      setFilteredBatchData(data.data)
     }
   };
-console.log(batchData)
-  const router = useRouter();
+
+  useEffect(() => {
+    const filtered = batchData.filter(
+      (batch) =>
+        batch.division.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        batch.branch.toLowerCase().includes(searchQuery.toLowerCase())
+        // batch.branch.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        // batch.rollNo.toString().includes(searchQuery)
+    );
+    setFilteredBatchData(filtered);
+  }, [searchQuery]);
+
   return (
     <div className="bg-white w-full h-full rounded-[5px] p-6">
       <div className="flex flex-col space-y-6">
@@ -46,6 +66,9 @@ console.log(batchData)
             <div className="bg-azure-50 flex flex-row items-center rounded-[50px] px-2">
               <IoSearchOutline className="text-2xl text-azure-600" />
               <input
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                }}
                 type="text"
                 className="w-full bg-azure-50 py-3 px-2 rounded-[50px] outline-none border-none placeholder:text-azure-600"
                 placeholder="Search by batch code, name ...."
@@ -72,7 +95,7 @@ console.log(batchData)
         </div>
         <div className="w-full h-[1px] bg-gray-300"></div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {batchData!.map((batch: any, index) => (
+          {filteredBatchData!.map((batch: any, index) => (
             <BatchItem
               key={index}
               batchCode={batch.division}
