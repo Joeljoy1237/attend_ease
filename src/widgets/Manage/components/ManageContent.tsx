@@ -1,6 +1,4 @@
 "use client";
-import BatchItem from "@components/BatchItem";
-import TitleBar from "@components/TitleBar";
 import React, { useEffect, useState } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { LuRefreshCcw } from "react-icons/lu";
@@ -8,6 +6,8 @@ import { FiEdit } from "react-icons/fi";
 import { FaCirclePlus } from "react-icons/fa6";
 import { MdOutlineDelete } from "react-icons/md";
 import { useRouter } from "next/navigation";
+import TitleBar from "@components/TitleBar";
+import BatchItem from "@components/BatchItem";
 
 type Student = {
   _id: string;
@@ -53,7 +53,7 @@ export default function ManageContent() {
     fetchStudent();
   }, [sortOrder]);
 
-  const handleEdit = (index: any) => {
+  const handleEdit = (index: number) => {
     const formData = {
       id: studentData[index]._id,
       rollNo: studentData[index].rollNo,
@@ -63,8 +63,34 @@ export default function ManageContent() {
     };
 
     const query = new URLSearchParams(formData).toString();
-
     router.push(`manage/edit?${query}`);
+  };
+
+  const handleDelete = async (index: number) => {
+    // Ask for confirmation before deleting
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this student?"
+    );
+
+    if (isConfirmed) {
+      const res = await fetch("/api/batch/delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: studentData[index]._id,
+        }),
+      });
+
+      if (res.ok) {
+        setStudentData(
+          studentData.filter((_, i) => i !== index) // Remove deleted item from the state
+        );
+      } else {
+        alert("Failed to delete the student");
+      }
+    }
   };
 
   useEffect(() => {
@@ -179,7 +205,10 @@ export default function ManageContent() {
                       >
                         <FiEdit className="text-2xl" />
                       </button>
-                      <button className="text-red-600">
+                      <button
+                        className="text-red-600"
+                        onClick={() => handleDelete(index)}
+                      >
                         <MdOutlineDelete className="text-2xl" />
                       </button>
                     </div>
