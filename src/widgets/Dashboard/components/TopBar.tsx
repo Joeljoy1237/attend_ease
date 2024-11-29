@@ -1,7 +1,7 @@
 import React from "react";
 import { IoPersonCircleOutline } from "react-icons/io5";
 
-export default function TopBar() {
+export default function TopBar(props: any) {
   // Get current date in the desired format
   const formatDate = () => {
     const today = new Date();
@@ -19,7 +19,7 @@ export default function TopBar() {
       <div className="flex flex-row w-full">
         <div className="flex-1 flex items-center justify-start">
           <span className="text-xl font-medium text-azure-600">
-            Hello, Abhishek Santhosh👋
+            Hello, {props.username}👋
           </span>
         </div>
         <div className="flex-1 flex flex-row items-center justify-end space-x-4">

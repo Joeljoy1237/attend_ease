@@ -7,6 +7,7 @@ import { LuRefreshCcw } from "react-icons/lu";
 import { FiEdit } from "react-icons/fi";
 import { FaCirclePlus } from "react-icons/fa6";
 import { MdOutlineDelete } from "react-icons/md";
+import { useRouter } from "next/navigation";
 
 type Student = {
   _id: string;
@@ -17,10 +18,12 @@ type Student = {
 };
 
 export default function ManageContent() {
+  const router = useRouter();
   const [studentData, setStudentData] = useState<Student[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredStudentData, setFilteredStudentData] = useState<Student[]>([]);
   const [sortOrder, setSortOrder] = useState("asc");
+  const [status, setStatus] = useState("Loading....");
 
   useEffect(() => {
     const fetchStudent = async () => {
@@ -42,11 +45,27 @@ export default function ManageContent() {
         console.log(data.studentData);
         setStudentData(data.studentData);
         setFilteredStudentData(data.studentData);
+      } else {
+        setStatus("No data found");
       }
     };
 
     fetchStudent();
   }, [sortOrder]);
+
+  const handleEdit = (index: any) => {
+    const formData = {
+      id: studentData[index]._id,
+      rollNo: studentData[index].rollNo,
+      name: studentData[index].name,
+      admissionNo: studentData[index].admnNo,
+      class: studentData[index].branch,
+    };
+
+    const query = new URLSearchParams(formData).toString();
+
+    router.push(`manage/edit?${query}`);
+  };
 
   useEffect(() => {
     const filtered = studentData.filter(
@@ -154,7 +173,10 @@ export default function ManageContent() {
                   </div>
                   <div className="flex-1 px-4 py-2 text-center text-base text-gray-700">
                     <div className="flex gap-2 items-center justify-center">
-                      <button className="text-azure-600">
+                      <button
+                        className="text-azure-600"
+                        onClick={() => handleEdit(index)}
+                      >
                         <FiEdit className="text-2xl" />
                       </button>
                       <button className="text-red-600">
@@ -167,7 +189,7 @@ export default function ManageContent() {
             </div>
           ) : (
             <div className="h-[42vh] flex items-center justify-center">
-              <span className="text-azure-600">No data found</span>
+              <span className="text-azure-600">{status}</span>
             </div>
           )}
         </div>
