@@ -7,7 +7,8 @@ import { FaCirclePlus } from "react-icons/fa6";
 import { MdOutlineDelete } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import TitleBar from "@components/TitleBar";
-import BatchItem from "@components/BatchItem";
+import ConfirmModal from "@components/ConfirmModal";
+import customToast from "@components/CustomToast";
 
 type Student = {
   _id: string;
@@ -24,6 +25,10 @@ export default function ManageContent() {
   const [filteredStudentData, setFilteredStudentData] = useState<Student[]>([]);
   const [sortOrder, setSortOrder] = useState("asc");
   const [status, setStatus] = useState("Loading....");
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+  const [deleteStudentId, setDeleteStudentId] = useState<string | null>(null);
+  const [deleteStudentIndex, setDeleteStudentIndex] = useState(0);
+  const [studentsCount, setStudentsCount] = useState(0);
 
   useEffect(() => {
     const fetchStudent = async () => {
@@ -42,7 +47,6 @@ export default function ManageContent() {
 
       if (res.ok) {
         const data = await res.json();
-        console.log(data.studentData);
         setStudentData(data.studentData);
         setFilteredStudentData(data.studentData);
       } else {
@@ -66,29 +70,52 @@ export default function ManageContent() {
     router.push(`manage/edit?${query}`);
   };
 
-  const handleDelete = async (index: number) => {
-    // Ask for confirmation before deleting
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this student?"
-    );
+  const handleDelete = async () => {
+    if (deleteStudentId) {
+      try {
+        const response = await fetch("/api/manage/delete", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: deleteStudentId,
+          }),
+        });
 
-    if (isConfirmed) {
-      const res = await fetch("/api/batch/delete", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: studentData[index]._id,
-        }),
-      });
+        // Parse response
+        const data = await response.json();
 
-      if (res.ok) {
-        setStudentData(
-          studentData.filter((_, i) => i !== index) // Remove deleted item from the state
+        // Handle non-OK responses
+        if (!response.ok) {
+          throw data;
+        }
+
+        // Success
+        console.log("Student deleted successfully:", data.message);
+        setFilteredStudentData((prevData) =>
+          prevData.filter((student) => student._id !== deleteStudentId)
         );
-      } else {
-        alert("Failed to delete the student");
+        setShowDeleteConfirmModal(false);
+        setDeleteStudentIndex(0);
+
+        customToast({
+          message: data.message || "Student data deleted",
+          type: "success",
+          showIcon: true,
+        });
+      } catch (err: any) {
+        // Ensure consistent error message display
+        const errorMessage =
+          err.message || "Failed to delete the student. Please try again.";
+
+        customToast({
+          message: errorMessage,
+          type: "error",
+          desc: err.desc,
+          showIcon: true,
+        });
+      } finally {
       }
     }
   };
@@ -108,6 +135,9 @@ export default function ManageContent() {
     setSortOrder(e.target.value);
   };
 
+  const handleClose = () => {
+    setShowDeleteConfirmModal(false);
+  };
   return (
     <div className="bg-white w-full h-auto rounded-[5px] p-6">
       <div className="flex flex-col space-y-6">
@@ -135,7 +165,7 @@ export default function ManageContent() {
           <div className="flex-[2] flex items-center justify-end gap-5">
             <div className="bg-azure-50 rounded-[10px] p-2">
               <span className="text-azure-600">
-                Items count: {filteredStudentData.length}
+                Items count: {filteredStudentData?.length}
               </span>
             </div>
             <div className="relative">
@@ -201,13 +231,19 @@ export default function ManageContent() {
                     <div className="flex gap-2 items-center justify-center">
                       <button
                         className="text-azure-600"
-                        onClick={() => router.push(`/dashboard/manage/edit/${student?._id}`)}
+                        onClick={() =>
+                          router.push(`/dashboard/manage/edit/${student?._id}`)
+                        }
                       >
                         <FiEdit className="text-2xl" />
                       </button>
                       <button
                         className="text-red-600"
-                        onClick={() => handleDelete(index)}
+                        onClick={() => {
+                          setDeleteStudentId(student._id);
+                          setShowDeleteConfirmModal(true);
+                          setDeleteStudentIndex(index);
+                        }}
                       >
                         <MdOutlineDelete className="text-2xl" />
                       </button>
@@ -217,12 +253,27 @@ export default function ManageContent() {
               ))}
             </div>
           ) : (
-            <div className="h-[42vh] flex items-center justify-center">
-              <span className="text-azure-600">{status}</span>
+            <div className="p-6 h-[42vh] flex items-center justify-center">
+              <p className="text-center text-xl font-medium text-azure-500">
+                No students found
+              </p>
             </div>
           )}
         </div>
       </div>
+
+      {showDeleteConfirmModal && (
+        <ConfirmModal
+          isOpen={showDeleteConfirmModal}
+          title={`Delete Student  " ${filteredStudentData[
+            deleteStudentIndex
+          ].name.toUpperCase()} - (${
+            filteredStudentData[deleteStudentIndex].admnNo
+          }) "`}
+          onCancel={handleClose}
+          onConfirm={handleDelete}
+        />
+      )}
     </div>
   );
 }
