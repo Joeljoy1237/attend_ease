@@ -201,7 +201,7 @@ export default function ManageContent() {
                     <div className="flex gap-2 items-center justify-center">
                       <button
                         className="text-azure-600"
-                        onClick={() => handleEdit(index)}
+                        onClick={() => router.push(`/dashboard/manage/edit/${student?._id}`)}
                       >
                         <FiEdit className="text-2xl" />
                       </button>

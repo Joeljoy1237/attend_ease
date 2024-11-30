@@ -1,13 +1,22 @@
 import React from "react";
+import { IoCheckmarkCircle } from "react-icons/io5";
+import { MdError } from "react-icons/md";
 
 interface ToastProps {
   type: "success" | "error" | "info"; // Added 'info' type
+  showIcon?: boolean;
   message: string;
   desc?: string;
   toastId: string;
 }
 
-const TedxToast: React.FC<ToastProps> = ({ type, message, toastId, desc }) => {
+const TedxToast: React.FC<ToastProps> = ({
+  type,
+  message,
+  toastId,
+  desc,
+  showIcon = false,
+}) => {
   let backgroundColor;
   let textColor;
 
@@ -33,13 +42,22 @@ const TedxToast: React.FC<ToastProps> = ({ type, message, toastId, desc }) => {
     <div
       className={`${
         toastId ? "animate-enter" : "animate-leave"
-      } max-w-xs w-full ${backgroundColor} shadow-lg rounded-lg pointer-events-auto flex`}
+      } max-w-[310px] w-full ${backgroundColor} shadow-lg rounded-lg pointer-events-auto flex`}
     >
       <div className="flex-1 w-0 p-3">
         <div className="flex items-center">
-          <div className="ml-3 flex-1">
+          {showIcon && (
+            <>
+              {type === "error" ? (
+                <MdError className="text-2xl text-white" />
+              ) : (
+                <IoCheckmarkCircle className="text-2xl text-white" />
+              )}
+            </>
+          )}
+          <div className="ml-2 flex-1 flex flex-col items-start justify-center">
             <p className={`text-base font-medium ${textColor}`}>{message}</p>
-            <p className={`mt-1 text-sm ${textColor}`}>{desc}</p>
+            {desc && <p className={`mt-1 text-sm ${textColor}`}>{desc}</p>}
           </div>
         </div>
       </div>
