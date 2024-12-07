@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
         if (attendanceRecords.length === 0) {
             return new Response(
-                JSON.stringify({ message: "No attendance records found for the given division" }),
+                JSON.stringify({ message: "No attendance records found for the given division",attendanceCounts:[] }),
                 { status: 404 }
             );
         }

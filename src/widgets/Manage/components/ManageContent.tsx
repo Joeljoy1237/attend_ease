@@ -229,6 +229,14 @@ export default function ManageContent() {
                   </div>
                   <div className="flex-1 px-4 py-2 text-center text-base text-gray-700">
                     <div className="flex gap-2 items-center justify-center">
+                    <button
+                        className="text-azure-600 flex flex-row items-center justify-center bg-azure-100 p-2 rounded-[8px] text-xs"
+                        onClick={() =>
+                          router.push(`/dashboard/manage/view-stats/${student?._id}`)
+                        }
+                      >
+                        View stats
+                      </button>
                       <button
                         className="text-azure-600"
                         onClick={() =>

@@ -69,7 +69,7 @@ export default function StatsContent() {
       console.log(error);
     }
   };
-
+console.log(attendanceData)
   useEffect(() => {
     fetchStats();
   }, [division]);
@@ -116,7 +116,7 @@ export default function StatsContent() {
               </button>
             </div>
           </div>
-          {attendanceData?.attendanceCounts.length === 0 ? (
+          {attendanceData === null || attendanceData?.attendanceCounts.length === 0 ? (
             <div className="w-full flex items-center justify-center h-[40vh]">
               <span className="text-azure-600">No records to display!</span>
             </div>
