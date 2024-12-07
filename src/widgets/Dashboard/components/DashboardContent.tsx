@@ -2,10 +2,11 @@
 import React, { useEffect, useState } from "react";
 import AttendanceItem from "@components/AttendanceItem";
 import TitleBar from "@components/TitleBar";
+import { useRouter } from "next/navigation";
 
 type TodaysStats = {
-  attendanceChange:string
-  absenteeChange:string;
+  attendanceChange: string;
+  absenteeChange: string;
   todaysAbsentCount: number;
   todaysPresentCount: number;
   totalStudentsCount: number;
@@ -22,12 +23,15 @@ export default function DashboardContent() {
   const [yesterdayPresent, setYesterdayPresent] = useState<number>(0); // Yesterday's present count
   const [presentChange, setPresentChange] = useState<number>(0); // Percentage change for present
   const [absentChange, setAbsentChange] = useState<number>(0); // Percentage change for absent
-  const [todaysStats, setTodaysStats] = useState<TodaysStats | undefined>(undefined);
-
+  const [todaysStats, setTodaysStats] = useState<TodaysStats | undefined>(
+    undefined
+  );
+  const router = useRouter();
   const fetchAttendanceHistory = async () => {
     try {
       const response = await fetch("/api/attendance/getAllAttendanceCounts", {
         method: "POST",
+        body: JSON.stringify({ limit: 16 }),
       }); // Make the API request
       const data = await response.json();
 
@@ -94,7 +98,7 @@ export default function DashboardContent() {
         method: "POST",
       }); // Make the API request
       const data = await response.json();
-      setTodaysStats(data)
+      setTodaysStats(data);
       console.log(data);
     } catch (error) {
       console.log(error);
@@ -129,7 +133,7 @@ export default function DashboardContent() {
           </div>
           <div className="">
             <span className="text-gray-500 text-sm">
-            {todaysStats?.attendanceChange}
+              {todaysStats?.attendanceChange}
             </span>
           </div>
         </div>
@@ -181,7 +185,12 @@ export default function DashboardContent() {
           <div className="flex flex-row items-center justify-between">
             <TitleBar title="Attendance history" />
             <div className="">
-              <button className="">
+              <button
+                onClick={() => {
+                  router.push("/dashboard/attendance/history");
+                }}
+                className=""
+              >
                 <span className="font-semibold text-azure-600">View all</span>
               </button>
             </div>

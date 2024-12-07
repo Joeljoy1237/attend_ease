@@ -6,9 +6,15 @@ export async function POST(request: Request) {
     try {
         // Connect to the database
         await connectToDB();
-
+        const { limit } = await request.json();
+        console.log(limit)
         // Retrieve all attendance records
-        const attendanceRecords = await Attendance.find();
+        let attendanceRecords
+        if (limit > 0) {
+            attendanceRecords = await Attendance.find().limit(16);
+        } else {
+            attendanceRecords = await Attendance.find()
+        }
         const studentCount = await Student.countDocuments();
         console.log(studentCount);
 
@@ -18,11 +24,8 @@ export async function POST(request: Request) {
                 { status: 404 }
             );
         }
-
-        // Get today's date in the format "YYYY-MM-DD"
         const currentDate = new Date().toISOString().split("T")[0];
 
-        // Group attendance counts by date, excluding the current date
         const groupedAttendance = attendanceRecords.reduce((acc, record) => {
             const attendanceValues = Array.from(record.data.values());
 
@@ -30,10 +33,8 @@ export async function POST(request: Request) {
                 (status) => status === true
             ).length;
 
-            // Format record date to "YYYY-MM-DD" for comparison
             const formattedDate = new Date(record.date).toISOString().split("T")[0];
 
-            // Exclude the current date
             if (formattedDate === currentDate) return acc;
 
             if (!acc[formattedDate]) {
