@@ -74,9 +74,9 @@ export default function BatchContent() {
               onClick={() => {
                 router.push("/dashboard/batches/new-batch");
               }}
-              className="p-3 text-white bg-azure-600 outline-none border-none rounded-[8px] flex items-center justify-center gap-2"
+              className="p-2 text-white text-sm bg-azure-600 outline-none border-none rounded-[8px] flex items-center justify-center gap-2"
             >
-              <FaCirclePlus className="text-2xl text-white" />
+              <FaCirclePlus className="text-sm text-white" />
               Add New Batch
             </button>
           </div>
