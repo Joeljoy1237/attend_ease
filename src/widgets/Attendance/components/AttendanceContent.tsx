@@ -1,5 +1,6 @@
 "use client";
 import BatchItem from "@components/BatchItem";
+import customToast from "@components/CustomToast";
 import TitleBar from "@components/TitleBar";
 import React, { useEffect, useState } from "react";
 import { IoSearchOutline } from "react-icons/io5";
@@ -100,7 +101,12 @@ export default function AttendanceContent() {
             </div>
 
             {/* Another Button */}
-            <button className="px-2 outline-none border-none">
+            <button
+              className="px-2 outline-none border-none"
+              onClick={() => {
+                fetchBatchCount();
+              }}
+            >
               <LuRefreshCcw className="text-azure-600 text-2xl" />
             </button>
           </div>
@@ -111,7 +117,7 @@ export default function AttendanceContent() {
             ? Array.from({ length: 8 }).map((_, idx) => (
                 <div
                   key={idx}
-                  className="relative w-[285px] h-[245px] p-4 rounded-md shadow-sm bg-white bg-opacity-20 border-[1px] border-azure-200 flex flex-col justify-between"
+                  className="relative w-[285px] h-[245px] p-4 rounded-md shadow-sm bg-white bg-opacity-20 border-[1px] border-azure-100 flex flex-col justify-between"
                 >
                   <div className="animate-pulse w-3/4 h-9 bg-gray-200 rounded-md"></div>
                   <div className="animate-pulse w-3/5 h-9 bg-gray-200 rounded-md"></div>
