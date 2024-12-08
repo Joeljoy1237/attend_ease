@@ -28,7 +28,7 @@ export default function BatchItem({
   const fullBatchName = batchNameMap[batchName] || batchName;
 console.log(batchName)
   return (
-    <div className="flex flex-col bg-white shadow-md p-4 rounded-lg border border-gray-200 w-[285px] gap-5">
+    <div className="flex flex-col bg-white p-4 rounded-lg border border-azure-200 w-[285px] gap-5 h-[245px]">
       <div className="flex flex-row items-center gap-4">
         <span className="text-2xl font-semibold text-azure-600 uppercase">
           {batchCode}
